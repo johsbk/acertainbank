@@ -5,7 +5,7 @@ package com.acertainbank.exceptions;
  * with which adding a branch to AccountManager
  * is called is already present in the system.
  */
-public class ExistentBranchException extends Exception {
+public class ExistentBranchException extends AccountManagerException {
 
 	private static final long serialVersionUID = 1L;
 	private int branchId;

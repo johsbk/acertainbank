@@ -7,15 +7,15 @@ import com.acertainbank.exceptions.ExistentAccountException;
 import com.acertainbank.exceptions.NegativeAmountException;
 
 import java.util.HashMap;
-public class CertainAccountManager implements AccountManager {
-	private static CertainAccountManager singleInstance;
+public class AccountManagerPartition implements AccountManager {
+	private static AccountManagerPartition singleInstance;
 	private HashMap<Integer,BankBranch> branches = new HashMap<Integer,BankBranch>();
 	
-	public synchronized static CertainAccountManager getInstance() {
+	public synchronized static AccountManagerPartition getInstance() {
 		if (singleInstance != null) {
 		    return singleInstance;
 		} else {
-		    singleInstance = new CertainAccountManager();
+		    singleInstance = new AccountManagerPartition();
 		}
 		return singleInstance;
     }

@@ -5,7 +5,7 @@ package com.acertainbank.exceptions;
  * with which adding an account AccountManager
  * is called is already present in the system.
  */
-public class ExistentAccountException extends Exception {
+public class ExistentAccountException extends AccountManagerException {
 
 	private static final long serialVersionUID = 1L;
 	private int accountId;

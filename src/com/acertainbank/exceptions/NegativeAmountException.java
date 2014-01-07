@@ -5,7 +5,7 @@ package com.acertainbank.exceptions;
  * which one of the calls to AccountManager is called
  * is negative.
  */
-public class NegativeAmountException extends Exception {
+public class NegativeAmountException extends AccountManagerException {
 
 	private static final long serialVersionUID = 1L;
 	private double amount;

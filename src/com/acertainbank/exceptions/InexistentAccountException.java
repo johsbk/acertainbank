@@ -5,7 +5,7 @@ package com.acertainbank.exceptions;
  * with which one of the calls to AccountManager
  * is called is not present in the system.
  */
-public class InexistentAccountException extends Exception {
+public class InexistentAccountException extends AccountManagerException {
 
 	private static final long serialVersionUID = 1L;
 	private int accountId;

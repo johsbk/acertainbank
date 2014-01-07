@@ -4,19 +4,18 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
-import com.acertainbank.business.CertainAccountManager;
+import com.acertainbank.business.AccountManagerPartition;
 import com.acertainbank.exceptions.ExistentAccountException;
 import com.acertainbank.exceptions.ExistentBranchException;
 import com.acertainbank.exceptions.InexistentAccountException;
 import com.acertainbank.exceptions.InexistentBranchException;
 import com.acertainbank.exceptions.NegativeAmountException;
 public class CertainAccountManagerTest {
-	private static CertainAccountManager accountManager;
+	private static AccountManagerPartition accountManager;
 	@BeforeClass
     public static void setUpBeforeClass() {
-		accountManager = CertainAccountManager.getInstance();
+		accountManager = AccountManagerPartition.getInstance();
 		
     }
 	@Before
