@@ -8,6 +8,7 @@ import org.junit.rules.ExpectedException;
 
 import com.acertainbank.business.CertainAccountManager;
 import com.acertainbank.exceptions.ExistentAccountException;
+import com.acertainbank.exceptions.ExistentBranchException;
 import com.acertainbank.exceptions.InexistentAccountException;
 import com.acertainbank.exceptions.InexistentBranchException;
 import com.acertainbank.exceptions.NegativeAmountException;
@@ -16,7 +17,7 @@ public class CertainAccountManagerTest {
 	@BeforeClass
     public static void setUpBeforeClass() {
 		accountManager = CertainAccountManager.getInstance();
-		accountManager.branchId = 1;
+		
     }
 	@Before
     public void setUp() throws Exception {
@@ -24,6 +25,11 @@ public class CertainAccountManagerTest {
     }
     @Test
     public void addAccounts() {
+    	try {
+			accountManager.addBranch(1);
+		} catch (ExistentBranchException e) {
+			fail();
+		}
     	try {
 			accountManager.addAccount(2,1);
 			fail();
@@ -55,10 +61,15 @@ public class CertainAccountManagerTest {
     @Test
     public void creditAccount() {
     	try {
+			accountManager.addBranch(1);
+		} catch (ExistentBranchException e) {
+			fail();
+		}
+    	try {
     		accountManager.addAccount(1,1);
     	} catch(Exception e) {
     		e.printStackTrace();
-	    	fail();
+	    	fail("");
     	}
     	try {
 			accountManager.credit(1, 1, 5.0);
@@ -90,6 +101,11 @@ public class CertainAccountManagerTest {
     
     @Test
     public void debitAccount() {
+    	try {
+			accountManager.addBranch(1);
+		} catch (ExistentBranchException e) {
+			fail();
+		}
     	try {
     		accountManager.addAccount(1,1);
     	} catch(Exception e) {
@@ -126,6 +142,11 @@ public class CertainAccountManagerTest {
     
     @Test
     public void calculateExposure() {
+    	try {
+			accountManager.addBranch(1);
+		} catch (ExistentBranchException e) {
+			fail();
+		}
     	try {
     		accountManager.addAccount(1,1,-5.);
     	} catch(Exception e) {

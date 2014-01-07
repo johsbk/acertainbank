@@ -2,8 +2,8 @@ package com.acertainbank.exceptions;
 
 /**
  * This Exception is thrown when the branch and account ID
- * with which one of the calls to AccountManager
- * is called is not present in the system.
+ * with which adding an account AccountManager
+ * is called is already present in the system.
  */
 public class ExistentAccountException extends Exception {
 
