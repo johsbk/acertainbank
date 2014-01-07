@@ -2,13 +2,36 @@ package com.acertainbank.business;
 import com.acertainbank.interfaces.AccountManager;
 import com.acertainbank.exceptions.InexistentBranchException;
 import com.acertainbank.exceptions.InexistentAccountException;
+import com.acertainbank.exceptions.ExistentAccountException;
 import com.acertainbank.exceptions.NegativeAmountException;
+
 import java.util.HashMap;
+import java.util.Map.Entry;
 public class CertainAccountManager implements AccountManager {
-	private int branchId;
-	private HashMap<int,Double> accounts = new HashMap<int,Double>();
-	public CertainAccountManager(int branchId) {
-		this.branchId = branchId;
+	private static CertainAccountManager singleInstance;
+	public int branchId =0;
+	private HashMap<Integer,Double> accounts = new HashMap<Integer,Double>();
+	
+	public synchronized static CertainAccountManager getInstance() {
+		if (singleInstance != null) {
+		    return singleInstance;
+		} else {
+		    singleInstance = new CertainAccountManager();
+		}
+		return singleInstance;
+    }
+	public synchronized void  addAccount(int branchId, int accountId) throws InexistentBranchException, ExistentAccountException {
+		this.addAccount(branchId,accountId,0.0);
+	}
+	public synchronized void addAccount(int branchId, int accountId, double balance) throws InexistentBranchException, ExistentAccountException {
+		if (this.branchId!=branchId) throw new InexistentBranchException(branchId);
+		if (accounts.containsKey(accountId)) throw new ExistentAccountException(accountId);
+		accounts.put(accountId,new Double(balance));
+	}
+	public synchronized double getAccountBalance(int branchId,int accountId) throws InexistentBranchException,InexistentAccountException {
+		if (this.branchId!=branchId) throw new InexistentBranchException(branchId);
+		if (!accounts.containsKey(accountId)) throw new InexistentAccountException(accountId);
+		return accounts.get(accountId);
 	}
 	/**
 	 * This operation credits the specified account at the given
@@ -19,11 +42,9 @@ public class CertainAccountManager implements AccountManager {
 	 * @param branchId Branch where the account resides.
 	 * @param accountId	Account to be credited.
 	 * @param amount Amount with which to credit the account.
-	 * @throws InexistentBranchException If the branch does not exist
-	 * in the system.
-	 * @throws InexistentAccountException If the account does not exist
-	 * in the system.
-	 * @throws NegativeAmountException If the amount used is negative.
+	 * @throws InexistentBranchException 
+	 * @throws InexistentAccountException 
+	 * @throws NegativeAmountException 
 	 */
 	public synchronized void credit (int branchId, int accountId, double amount) throws InexistentBranchException, InexistentAccountException, NegativeAmountException {
 		if (this.branchId!=branchId) throw new InexistentBranchException(branchId);
@@ -102,9 +123,9 @@ public class CertainAccountManager implements AccountManager {
 	public synchronized double calculateExposure (int branchId) throws InexistentBranchException {
 		if (this.branchId!=branchId) throw new InexistentBranchException(branchId);
 		double result = 0.0;
-		for (Double balance : accounts) {
-			if (balance<0) {
-				result -= balance;
+		for (Entry<Integer,Double> entry : accounts.entrySet()) {
+			if (entry.getValue()<0) {
+				result -= entry.getValue();
 			}
 		}
 		return result;

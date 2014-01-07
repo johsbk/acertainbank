@@ -1,5 +1,9 @@
 package com.acertainbank.interfaces;
 
+import com.acertainbank.exceptions.InexistentAccountException;
+import com.acertainbank.exceptions.InexistentBranchException;
+import com.acertainbank.exceptions.NegativeAmountException;
+
 /**
  * This interface defines the operations that are used
  * to manage accounts and branches in an AccountManager
