@@ -1,4 +1,4 @@
-package com.acertainbank;
+package com.acertainbank.interfaces;
 
 /**
  * This interface defines the operations that are used
