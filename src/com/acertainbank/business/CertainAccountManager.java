@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 public class CertainAccountManager implements AccountManager {
 	private static CertainAccountManager singleInstance;
 	public int branchId =0;
-	private HashMap<Integer,Double> accounts = new HashMap<Integer,Double>();
+	private HashMap<Integer,BankAccount> accounts = new HashMap<Integer,BankAccount>();
 	
 	public synchronized static CertainAccountManager getInstance() {
 		if (singleInstance != null) {
@@ -26,12 +26,15 @@ public class CertainAccountManager implements AccountManager {
 	public synchronized void addAccount(int branchId, int accountId, double balance) throws InexistentBranchException, ExistentAccountException {
 		if (this.branchId!=branchId) throw new InexistentBranchException(branchId);
 		if (accounts.containsKey(accountId)) throw new ExistentAccountException(accountId);
-		accounts.put(accountId,new Double(balance));
+		accounts.put(accountId,new BankAccount(accountId,balance));
+	}
+	public synchronized void reset() {
+		accounts = new HashMap<Integer,BankAccount>();
 	}
 	public synchronized double getAccountBalance(int branchId,int accountId) throws InexistentBranchException,InexistentAccountException {
 		if (this.branchId!=branchId) throw new InexistentBranchException(branchId);
 		if (!accounts.containsKey(accountId)) throw new InexistentAccountException(accountId);
-		return accounts.get(accountId);
+		return accounts.get(accountId).balance;
 	}
 	/**
 	 * This operation credits the specified account at the given
@@ -50,8 +53,8 @@ public class CertainAccountManager implements AccountManager {
 		if (this.branchId!=branchId) throw new InexistentBranchException(branchId);
 		if (!accounts.containsKey(accountId)) throw new InexistentAccountException(accountId);
 		if (amount <0.) throw new NegativeAmountException(amount);
-		Double balance = accounts.get(accountId);
-		balance += amount;
+		BankAccount account = accounts.get(accountId);
+		account.balance += amount;
 	}
 	
 	/**
@@ -73,8 +76,8 @@ public class CertainAccountManager implements AccountManager {
 		if (this.branchId!=branchId) throw new InexistentBranchException(branchId);
 		if (!accounts.containsKey(accountId)) throw new InexistentAccountException(accountId);
 		if (amount <0.) throw new NegativeAmountException(amount);
-		Double balance = accounts.get(accountId);
-		balance -= amount;
+		BankAccount account = accounts.get(accountId);
+		account.balance -= amount;
 	}
 	
 	/**
@@ -99,10 +102,10 @@ public class CertainAccountManager implements AccountManager {
 		if (!accounts.containsKey(accountIdOrig)) throw new InexistentAccountException(accountIdOrig);
 		if (!accounts.containsKey(accountIdDest)) throw new InexistentAccountException(accountIdDest);
 		if (amount <0.) throw new NegativeAmountException(amount);
-		Double balanceOrig = accounts.get(accountIdOrig);
-		Double balanceDest = accounts.get(accountIdDest);
-		balanceOrig -= amount;
-		balanceDest += amount;
+		BankAccount accountOrig = accounts.get(accountIdOrig);
+		BankAccount accountDest = accounts.get(accountIdDest);
+		accountOrig.balance -= amount;
+		accountDest.balance += amount;
 	}
 	
 	/**
@@ -123,9 +126,9 @@ public class CertainAccountManager implements AccountManager {
 	public synchronized double calculateExposure (int branchId) throws InexistentBranchException {
 		if (this.branchId!=branchId) throw new InexistentBranchException(branchId);
 		double result = 0.0;
-		for (Entry<Integer,Double> entry : accounts.entrySet()) {
-			if (entry.getValue()<0) {
-				result -= entry.getValue();
+		for (BankAccount account : accounts.values()) {
+			if (account.balance<0) {
+				result -= account.balance;
 			}
 		}
 		return result;
