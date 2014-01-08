@@ -22,7 +22,8 @@ public class BankBranch {
 		return this.branchId;
 	}
 	public Collection<BankAccount> getAccounts() {
-		return accounts.values();
+		Collection<BankAccount> result = accounts.values();
+		return result;
 	}
 	public void addAccount(int accountId, double balance) throws ExistentAccountException {
 		if (accounts.containsKey(accountId)) throw new ExistentAccountException(accountId);
