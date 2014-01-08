@@ -9,8 +9,16 @@ import com.acertainbank.exceptions.NegativeAmountException;
 import java.util.HashMap;
 public class AccountManagerPartition implements AccountManager {
 	private static AccountManagerPartition singleInstance;
+	private String partitionId;
 	private HashMap<Integer,BankBranch> branches = new HashMap<Integer,BankBranch>();
 	
+	public AccountManagerPartition(String partitionId) {
+		// TODO Auto-generated constructor stub
+		this.partitionId = partitionId;
+	}
+	public AccountManagerPartition() {
+		// TODO Auto-generated constructor stub
+	}
 	public synchronized static AccountManagerPartition getInstance() {
 		if (singleInstance != null) {
 		    return singleInstance;
@@ -19,6 +27,11 @@ public class AccountManagerPartition implements AccountManager {
 		}
 		return singleInstance;
     }
+	
+	public String getPartitionId(){
+		return this.partitionId;
+	}
+	
 	public synchronized void addBranch(int branchId) throws ExistentBranchException {
 		if(branches.containsKey(branchId)) throw new ExistentBranchException(branchId);
 		this.branches.put(branchId, new BankBranch(branchId));

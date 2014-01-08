@@ -23,7 +23,7 @@ import com.acertainbank.utils.AccountManagerUtility;
  * API declared in the BookStore class
  * 
  */
-public class AccountManagerHTTPProxy implements AccountManager {
+public class AccountManagerHTTPProxy implements AccountManager{
     protected HttpClient client;
     protected String serverAddress;
 
