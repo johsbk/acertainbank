@@ -63,11 +63,16 @@ public class AccountManagerPartition implements AccountManager {
 	 * @throws InexistentAccountException 
 	 * @throws NegativeAmountException 
 	 */
-	public synchronized void credit (int branchId, int accountId, double amount) throws InexistentBranchException, InexistentAccountException, NegativeAmountException {
+	public void credit (int branchId, int accountId, double amount) throws InexistentBranchException, InexistentAccountException, NegativeAmountException {
 		if (!branches.containsKey(branchId)) throw new InexistentBranchException(branchId);
 		if (amount <0.) throw new NegativeAmountException(amount);
-		BankAccount account = branches.get(branchId).getAccount(accountId);
+		BankBranch branch =branches.get(branchId);
+		branch.ixLock.readLock().lock(); // IX lock
+		BankAccount account = branch.getAccount(accountId);
+		account.lock.writeLock().lock();
 		account.balance += amount;
+		account.lock.writeLock().unlock();
+		branch.ixLock.readLock().unlock();
 	}
 	
 	/**
@@ -85,11 +90,16 @@ public class AccountManagerPartition implements AccountManager {
 	 * in the system.
 	 * @throws NegativeAmountException If the amount used is negative.
 	 */
-	public synchronized void debit (int branchId, int accountId, double amount) throws InexistentBranchException, InexistentAccountException, NegativeAmountException {
+	public void debit (int branchId, int accountId, double amount) throws InexistentBranchException, InexistentAccountException, NegativeAmountException {
 		if (!branches.containsKey(branchId)) throw new InexistentBranchException(branchId);
 		if (amount <0.) throw new NegativeAmountException(amount);
-		BankAccount account = branches.get(branchId).getAccount(accountId);
+		BankBranch branch =branches.get(branchId);
+		branch.ixLock.readLock().lock(); // IX lock
+		BankAccount account = branch.getAccount(accountId);
+		account.lock.writeLock().lock();
 		account.balance -= amount;
+		account.lock.writeLock().unlock();
+		branch.ixLock.readLock().unlock();
 	}
 	
 	/**
@@ -109,14 +119,20 @@ public class AccountManagerPartition implements AccountManager {
 	 * does not exist in the system.
 	 * @throws NegativeAmountException If the amount used is negative.
 	 */
-	public synchronized void transfer (int branchId, int accountIdOrig, int accountIdDest, double amount) throws InexistentBranchException, InexistentAccountException, NegativeAmountException {
+	public void transfer (int branchId, int accountIdOrig, int accountIdDest, double amount) throws InexistentBranchException, InexistentAccountException, NegativeAmountException {
 		if (!branches.containsKey(branchId)) throw new InexistentBranchException(branchId);
 		if (amount <0.) throw new NegativeAmountException(amount);
 		BankBranch branch = branches.get(branchId);
+		branch.ixLock.readLock().lock(); // IX lock
 		BankAccount accountOrig = branch.getAccount(accountIdOrig);
 		BankAccount accountDest = branch.getAccount(accountIdDest);
+		accountOrig.lock.writeLock().lock();
+		accountDest.lock.writeLock().lock();
 		accountOrig.balance -= amount;
 		accountDest.balance += amount;
+		accountOrig.lock.writeLock().unlock();
+		accountDest.lock.writeLock().unlock();
+		branch.ixLock.readLock().unlock();
 	}
 	
 	/**
@@ -134,15 +150,17 @@ public class AccountManagerPartition implements AccountManager {
 	 * @throws InexistentBranchException If the branch does not exist
 	 * in the system.
 	 */
-	public synchronized double calculateExposure (int branchId) throws InexistentBranchException {
+	public double calculateExposure (int branchId) throws InexistentBranchException {
 		if (!branches.containsKey(branchId)) throw new InexistentBranchException(branchId);
 		double result = 0.0;
 		BankBranch branch = branches.get(branchId);
+		branch.ixLock.writeLock().lock(); // S/X lock
 		for (BankAccount account : branch.getAccounts()) {
 			if (account.balance<0) {
 				result -= account.balance;
 			}
 		}
+		branch.ixLock.writeLock().unlock();
 		return result;
 	}
 }
