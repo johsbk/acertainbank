@@ -4,9 +4,6 @@
 package com.acertainbank.client;
 
 
-import java.util.HashMap;
-import java.util.List;
-
 import org.eclipse.jetty.client.ContentExchange;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.io.Buffer;
@@ -20,7 +17,6 @@ import com.acertainbank.exceptions.NegativeAmountException;
 import com.acertainbank.interfaces.AccountManager;
 import com.acertainbank.utils.AccountManagerMessageTag;
 import com.acertainbank.utils.AccountManagerUtility;
-import com.sun.corba.se.spi.orbutil.fsm.Guard.Result;
 
 /**
  * BookStoreHTTPProxy implements the client level synchronous CertainBookStore
@@ -29,13 +25,13 @@ import com.sun.corba.se.spi.orbutil.fsm.Guard.Result;
  */
 public class AccountManagerHTTPProxy implements AccountManager {
     protected HttpClient client;
-    protected HashMap<Integer, String> serverAddresses;
+    protected String serverAddress;
 
     /**
      * Initialize the client object
      */
-    public AccountManagerHTTPProxy(HashMap<Integer, String> serverAddresses) throws Exception {
-	setServerAddresses(serverAddresses);
+    public AccountManagerHTTPProxy(String serverAddress) throws Exception {
+	setServerAddress(serverAddress);
 	client = new HttpClient();
 	client.setConnectorType(HttpClient.CONNECTOR_SELECT_CHANNEL);
 	client.setMaxConnectionsPerAddress(AccountManagerClientConstants.CLIENT_MAX_CONNECTION_ADDRESS); // max
@@ -59,14 +55,12 @@ public class AccountManagerHTTPProxy implements AccountManager {
 	client.start();
     }
 
-    public String getServerAddress(int branchId) throws InexistentBranchException {
-    	Integer key =new Integer(branchId);
-    	if (!serverAddresses.containsKey(key)) throw new InexistentBranchException(branchId);
-    	return serverAddresses.get(key);
+    public String getServerAddress() throws InexistentBranchException {
+    	return this.serverAddress;
     }
 
-    public void setServerAddresses(HashMap<Integer, String> serverAddresses) {
-    	this.serverAddresses = serverAddresses;
+    public void setServerAddress(String serverAddress) {
+    	this.serverAddress = serverAddress;
     }
 
 
@@ -79,12 +73,13 @@ public class AccountManagerHTTPProxy implements AccountManager {
 		}
     }
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void credit(int branchId, int accountId, double amount)
 			throws InexistentBranchException, InexistentAccountException,
 			NegativeAmountException {
 		ContentExchange exchange = new ContentExchange();
-		String urlString = getServerAddress(branchId) + "/" + AccountManagerMessageTag.CREDIT;
+		String urlString = getServerAddress() + "/" + AccountManagerMessageTag.CREDIT;
 		JSONObject json = new JSONObject();
 		json.put("branchId", new Integer(branchId));
 		json.put("accountId", new Integer(accountId));
@@ -103,12 +98,13 @@ public class AccountManagerHTTPProxy implements AccountManager {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void debit(int branchId, int accountId, double amount)
 			throws InexistentBranchException, InexistentAccountException,
 			NegativeAmountException {
 		ContentExchange exchange = new ContentExchange();
-		String urlString = getServerAddress(branchId) + "/" + AccountManagerMessageTag.DEBIT;
+		String urlString = getServerAddress() + "/" + AccountManagerMessageTag.DEBIT;
 		JSONObject json = new JSONObject();
 		json.put("branchId", new Integer(branchId));
 		json.put("accountId", new Integer(accountId));
@@ -127,12 +123,13 @@ public class AccountManagerHTTPProxy implements AccountManager {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void transfer(int branchId, int accountIdOrig, int accountIdDest,
 			double amount) throws InexistentBranchException,
 			InexistentAccountException, NegativeAmountException {
 		ContentExchange exchange = new ContentExchange();
-		String urlString = getServerAddress(branchId) + "/" + AccountManagerMessageTag.TRANSFER;
+		String urlString = getServerAddress() + "/" + AccountManagerMessageTag.TRANSFER;
 		JSONObject json = new JSONObject();
 		json.put("branchId", new Integer(branchId));
 		json.put("accountIdOrig", new Integer(accountIdOrig));
@@ -152,11 +149,12 @@ public class AccountManagerHTTPProxy implements AccountManager {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public double calculateExposure(int branchId)
 			throws InexistentBranchException {
 		ContentExchange exchange = new ContentExchange();
-		String urlString = getServerAddress(branchId) + "/" + AccountManagerMessageTag.CALCULATE_EXPOSURE;
+		String urlString = getServerAddress() + "/" + AccountManagerMessageTag.CALCULATE_EXPOSURE;
 		JSONObject json = new JSONObject();
 		json.put("branchId", new Integer(branchId));
 
